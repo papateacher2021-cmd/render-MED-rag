@@ -96,7 +96,7 @@ def inicializar_sistema():
         vectorstore = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
     
     retriever = vectorstore.as_retriever(search_kwargs={"k": 12})
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Uso 2.5-flash que ha funcionado
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Uso 2.5-flash que ha funcionado
     
     # ... (el resto de tu template y return igual que antes)
     # Prompt Template
