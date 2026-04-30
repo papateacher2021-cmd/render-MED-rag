@@ -68,24 +68,6 @@ if not api_key:
     st.error("⚠️ No se encontró la GOOGLE_API_KEY. Por favor, configúrala.")
     st.stop()
 
-# @st.cache_resource
-"""
-def inicializar_sistema():
-    # Embeddings
-    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    
-    # Base de Datos
-    persist_dir = "./chroma_db"
-    if not os.path.exists(persist_dir):
-        st.error(f"❌ No se encuentra la carpeta '{persist_dir}'.")
-        st.stop()
-        
-    vectorstore = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 12})
-    
-    # Modelo LLM
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1)
-"""
 @st.cache_resource
 def inicializar_sistema():
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -100,7 +82,7 @@ def inicializar_sistema():
         docs = loader.load()
         
         # 2. Dividir texto
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=2000, chunk_overlap=300, separators=["\nArticle ", "\nARTICLE ", "\n\n", "\n", " ", ""])
         splits = text_splitter.split_documents(docs)
         
         # 3. Crear y persistir Chroma
@@ -114,7 +96,7 @@ def inicializar_sistema():
         vectorstore = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
     
     retriever = vectorstore.as_retriever(search_kwargs={"k": 12})
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Usé 1.5-flash que parecia estable
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Uso 2.5-flash que ha funcionado
     
     # ... (el resto de tu template y return igual que antes)
     # Prompt Template
