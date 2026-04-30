@@ -96,7 +96,7 @@ def inicializar_sistema():
         vectorstore = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
     
     retriever = vectorstore.as_retriever(search_kwargs={"k": 12})
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Uso 1.5-flash que ha funcionado
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Uso 1.5-flash que ha funcionado
     
     # ... (el resto de tu template y return igual que antes)
     # Prompt Template
@@ -164,4 +164,4 @@ if prompt := st.chat_input("¿En qué puedo ayudarte con la normativa MED?"):
 
 # Sidebar
 st.sidebar.caption("Proyecto: Pancho-MED-RAG v2.5")
-st.sidebar.info("Entorno de desarrollo: Ubuntu LTS. Despliegue en Render via GitHub")
+st.sidebar.info("Development Environment: From home in Linux Ubuntu LTS. Built and deploy at Render by GitHub. I'm ready my Master Pancho 😊 🚢✨ ⚓🦾 ")
