@@ -6,3 +6,4 @@ pydantic==1.10.13
 pysqlite3-binary
 langchain-huggingface
 langchain-chroma
+pypdf

@@ -16,6 +16,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
+from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 with st.sidebar:
     # st.image("tu_logo.png", width=100) # Opcional
@@ -66,7 +68,8 @@ if not api_key:
     st.error("⚠️ No se encontró la GOOGLE_API_KEY. Por favor, configúrala.")
     st.stop()
 
-@st.cache_resource
+# @st.cache_resource
+"""
 def inicializar_sistema():
     # Embeddings
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
@@ -82,7 +85,38 @@ def inicializar_sistema():
     
     # Modelo LLM
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1)
+"""
+@st.cache_resource
+def inicializar_sistema():
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    persist_dir = "./chroma_db"
     
+    # SI NO EXISTE LA DB, LA CREAMOS DESDE LOS PDFS
+    if not os.path.exists(persist_dir):
+        st.info("📦 Creando base de datos vectorial por primera vez... esto tardará un momento.")
+        
+        # 1. Cargar PDFs (asegúrate de que los PDFs estén en la raíz o en una carpeta 'data')
+        loader = DirectoryLoader('./', glob="./*.pdf", loader_cls=PyPDFLoader)
+        docs = loader.load()
+        
+        # 2. Dividir texto
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        splits = text_splitter.split_documents(docs)
+        
+        # 3. Crear y persistir Chroma
+        vectorstore = Chroma.from_documents(
+            documents=splits, 
+            embedding=embeddings, 
+            persist_directory=persist_dir
+        )
+    else:
+        # SI EXISTE, SOLO LA CARGAMOS
+        vectorstore = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
+    
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 12})
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, temperature=0.1) # Nota: Usé 1.5-flash que es la estable actual
+    
+    # ... (el resto de tu template y return igual que antes)
     # Prompt Template
     template = """I am the Pancho's MED Virtual Agent, a technical expert in the Marine Equipment Directive (MED) and MarED Recommendations.
 Answer the question based on the provided context.
