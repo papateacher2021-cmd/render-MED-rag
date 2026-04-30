@@ -71,7 +71,7 @@ if not api_key:
 @st.cache_resource
 def inicializar_sistema():
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    persist_dir = "./chroma_db"
+    persist_dir = "./chroma_db_v2"
     
     # SI NO EXISTE LA DB, LA CREAMOS DESDE LOS PDFS
     if not os.path.exists(persist_dir):
@@ -96,7 +96,7 @@ def inicializar_sistema():
         vectorstore = Chroma(persist_directory=persist_dir, embedding_function=embeddings)
     
     retriever = vectorstore.as_retriever(search_kwargs={"k": 12})
-    llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, version="v1", temperature=0.1) # Nota: No convert_system_message_to_human
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", google_api_key=api_key, temperature=0.1, convert_system_message_to_human=True) # Nota: Uso 2.5-flash que ha funcionado
     
     # ... (el resto de tu template y return igual que antes)
     # Prompt Template
@@ -164,4 +164,4 @@ if prompt := st.chat_input("¿En qué puedo ayudarte con la normativa MED?"):
 
 # Sidebar
 st.sidebar.caption("Proyecto: Pancho-MED-RAG v2.5")
-st.sidebar.info("Development Environment: From Alcochete's home in Linux Ubuntu LTS. Built and deploy at Render by GitHub. I'm ready, my Preclarus Master Pancho 😊 🚢✨ ⚓🦾 ")
+st.sidebar.info("Entorno de desarrollo: Ubuntu LTS. Despliegue en Render via GitHub")
